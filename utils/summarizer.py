@@ -113,6 +113,11 @@ class VideoSummarizer:
             
         scores = scores.view(-1).cpu().numpy()[:total_frames]
         
+        # Normalize scores for better visualization (0 to 1)
+        # This fixes the "flat graph" issue if raw scores are small
+        if scores.max() > scores.min():
+            scores = (scores - scores.min()) / (scores.max() - scores.min())
+        
         # Select keyframes
         num_summary_frames = max(1, int(total_frames * summary_ratio))
         top_indices = np.argsort(scores)[-num_summary_frames:]
