@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSTA | AI Video Intelligence</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">🎬 <span>HSTA</span> Summarizer</div>
+            <p class="tagline">Next-Gen Video Intelligence with Hierarchical Attention</p>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <section class="glass-card upload-section" id="drop-zone">
+                <h3>📥 Initialize Analysis</h3>
+                <div class="upload-box">
+                    <input type="file" id="video-input" hidden accept="video/*">
+                    <label for="video-input" class="upload-label">
+                        <div class="upload-icon">✨</div>
+                        <p>Drag & Drop or <span>Browse Files</span></p>
+                        <p class="small">MP4, AVI, MOV supported (Max 100MB)</p>
+                    </label>
+                </div>
+                <div id="progress-container" class="hidden">
+                    <div class="progress-bar-bg">
+                        <div id="progress-fill"></div>
+                    </div>
+                    <p id="status-text">Uploading...</p>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="hidden">
+                <div class="player-grid">
+                    <div class="glass-card player-card">
+                        <h4 class="accent-teal">Original Footage</h4>
+                        <video id="original-video" controls muted></video>
+                    </div>
+                    <div class="glass-card player-card">
+                        <h4 class="accent-purple">HSTA Compressed Summary</h4>
+                        <video id="summary-video" controls autoplay loop muted></video>
+                    </div>
+                </div>
+
+                <!-- Analysis Cards -->
+                <div class="analysis-grid">
+                    <div class="glass-card heatmap-card">
+                        <h4>🧠 Model Explainability</h4>
+                        <canvas id="attentionChart"></canvas>
+                    </div>
+                    <div class="glass-card captions-card">
+                        <h4>📝 Semantic Summary</h4>
+                        <div id="captions-list" class="captions-list">
+                            <!-- Captions will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-footer">
+                    <button class="btn btn-secondary" onclick="location.reload()">Reset Analysis</button>
+                    <a id="download-summary" class="btn btn-primary" download>Download Summary</a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Hybrid CNN-RNN Framework · Performance-per-Watt Optimized</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

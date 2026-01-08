@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Large Video Data & Models
+data/
+uploads/
+models/*.pth
+*.mp4
+*.wav
+*.avi
+
+# Temporary App Files
+static/temp_frames/
+temp_summary.mp4
+benchmark_results.txt
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Agent Artifacts
+.gemini/

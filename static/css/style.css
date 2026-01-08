@@ -1,0 +1,247 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --teal: #2dd4bf;
+    --purple: #a78bfa;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --accent-red: #f43f5e;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1200px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.logo {
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
+}
+
+.logo span {
+    background: linear-gradient(90deg, var(--teal), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+}
+
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    margin-bottom: 2rem;
+}
+
+h3,
+h4 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.accent-teal {
+    color: var(--teal);
+}
+
+.accent-purple {
+    color: var(--purple);
+}
+
+/* Upload Styles */
+.upload-box {
+    border: 2px dashed var(--card-border);
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-box:hover {
+    border-color: var(--teal);
+    background: rgba(45, 212, 191, 0.05);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.upload-label p {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.upload-label span {
+    color: var(--teal);
+    font-weight: 600;
+}
+
+.small {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+/* Progress Styles */
+#progress-container {
+    margin-top: 2rem;
+}
+
+.progress-bar-bg {
+    background: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+}
+
+#progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--teal), var(--purple));
+    transition: width 0.4s ease;
+}
+
+#status-text {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--teal);
+}
+
+/* Results Styles */
+.player-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+video {
+    width: 100%;
+    border-radius: 12px;
+    background: #000;
+}
+
+.heatmap-card {
+    position: relative;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.heatmap-card canvas {
+    flex-grow: 1;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.captions-card {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.caption-item {
+    display: flex;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.8rem;
+    border-radius: 12px;
+}
+
+.caption-item img {
+    width: 100px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.caption-text {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.caption-frame {
+    font-weight: 600;
+    color: var(--teal);
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Buttons */
+.comparison-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--teal), #0d9488);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 15px rgba(45, 212, 191, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.hidden {
+    display: none;
+}
+
+footer {
+    text-align: center;
+    margin-top: 4rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
