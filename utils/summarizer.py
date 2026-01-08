@@ -46,12 +46,19 @@ class VideoSummarizer:
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         
         # Extract audio for the whole video
-        audio_features = self.audio_extractor.extract(video_path, fps=fps)
-        # Ensure length matches total frames (truncate or pad)
-        if len(audio_features) > total_frames:
-            audio_features = audio_features[:total_frames]
-        elif len(audio_features) < total_frames:
-            pad = np.zeros((total_frames - len(audio_features), 128))
+        skip_frames = 15
+        effective_fps = fps / skip_frames
+        
+        # Extract audio with new effective FPS
+        audio_features = self.audio_extractor.extract(video_path, fps=effective_fps)
+        
+        # Ensure length matches total subsampled frames (truncate or pad)
+        expected_len = int(total_frames / skip_frames) + (1 if total_frames % skip_frames != 0 else 0)
+        
+        if len(audio_features) > expected_len:
+            audio_features = audio_features[:expected_len]
+        elif len(audio_features) < expected_len:
+            pad = np.zeros((expected_len - len(audio_features), 128))
             audio_features = np.vstack((audio_features, pad))
             
         audio_features = torch.tensor(audio_features, dtype=torch.float32)
@@ -63,37 +70,55 @@ class VideoSummarizer:
         frames_buffer = []
         features_list = []
         
-        curr_frame_idx = 0
+        curr_frame_idx = 0 # Index in the subsampled feature space
+        raw_frame_idx = 0  # Absolute frame index
         
         while True:
             ret, frame = cap.read()
             if not ret: break
             
-            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frames_buffer.append(img)
+            if raw_frame_idx % skip_frames == 0:
+                img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frames_buffer.append(img)
+                
+                if len(frames_buffer) >= 32:
+                    if status_callback: status_callback(f"Extracting Visual+Audio Features: {int(raw_frame_idx/total_frames*100)}%")
+                    
+                    # Visual Features (32, 960)
+                    vis_feats = self.extractor.extract(frames_buffer)
+                    
+                    # Audio Features (32, 128)
+                    end_idx = curr_frame_idx + len(frames_buffer)
+                    # Safe slice with padding if needed
+                    if end_idx > len(audio_features):
+                        # Pad audio if visual is slightly ahead due to rounding
+                        pad_size = end_idx - len(audio_features)
+                        aud_pad = torch.zeros(pad_size, 128)
+                        aud_feats = torch.cat([audio_features[curr_frame_idx:], aud_pad])
+                    else:
+                        aud_feats = audio_features[curr_frame_idx : end_idx]
+                    
+                    # Fuse: (32, 1088)
+                    if vis_feats.shape[0] == aud_feats.shape[0]:
+                        fused_feats = torch.cat((vis_feats, aud_feats), dim=1)
+                        features_list.append(fused_feats)
+                    
+                    curr_frame_idx += len(frames_buffer)
+                    frames_buffer = []
             
-            if len(frames_buffer) >= 32:
-                if status_callback: status_callback(f"Extracting Visual+Audio Features: {int(len(features_list)*32/total_frames*100)}%")
-                
-                # Visual Features (32, 960)
-                vis_feats = self.extractor.extract(frames_buffer)
-                
-                # Audio Features (32, 128)
-                # Slice the corresponding audio segment
-                end_idx = curr_frame_idx + len(frames_buffer)
-                aud_feats = audio_features[curr_frame_idx : end_idx]
-                
-                # Fuse: (32, 1088)
-                fused_feats = torch.cat((vis_feats, aud_feats), dim=1)
-                features_list.append(fused_feats)
-                
-                curr_frame_idx = end_idx
-                frames_buffer = []
+            raw_frame_idx += 1
         
         if frames_buffer:
             vis_feats = self.extractor.extract(frames_buffer)
-            end_idx = curr_frame_idx + len(frames_buffer)
-            aud_feats = audio_features[curr_frame_idx : end_idx]
+            # Handle remaining audio
+            aud_feats = audio_features[curr_frame_idx:]
+            # Pad audio to match visual
+            if aud_feats.shape[0] < vis_feats.shape[0]:
+                pad_size = vis_feats.shape[0] - aud_feats.shape[0]
+                aud_feats = torch.cat([aud_feats, torch.zeros(pad_size, 128)])
+            elif aud_feats.shape[0] > vis_feats.shape[0]:
+                aud_feats = aud_feats[:vis_feats.shape[0]]
+                
             fused_feats = torch.cat((vis_feats, aud_feats), dim=1)
             features_list.append(fused_feats)
             
