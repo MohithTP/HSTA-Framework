@@ -18,13 +18,15 @@ class AudioExtractor:
             if video.audio is None:
                 return np.zeros((int(video.duration * (fps or video.fps)), self.n_mfcc))
             
-            audio_path = video_path.replace(".mp4", "_temp.wav")
-            video.audio.write_audiofile(audio_path, logger=None, fps=self.target_sr)
+            # Extract audio array directly (faster than writing to disk)
+            # Returns (n_samples, n_channels)
+            y = video.audio.to_soundarray(fps=self.target_sr)
             
-            y, sr = librosa.load(audio_path, sr=self.target_sr)
-            
-            if os.path.exists(audio_path):
-                os.remove(audio_path)
+            # Convert to mono if stereo
+            if y.ndim > 1:
+                y = y.mean(axis=1)
+                
+            sr = self.target_sr
                 
             video_fps = fps if fps else video.fps
             if not video_fps: video_fps = 30.0

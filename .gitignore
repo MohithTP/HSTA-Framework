@@ -23,5 +23,3 @@ benchmark_results.txt
 .DS_Store
 Thumbs.db
 
-# Agent Artifacts
-.gemini/

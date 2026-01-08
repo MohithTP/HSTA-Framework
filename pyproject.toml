@@ -1,7 +1,19 @@
 [project]
 name = "ann"
 version = "0.1.0"
-description = "Add your description here"
+description = "HSTA Video Framework"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "opencv-python",
+    "Pillow",
+    "transformers",
+    "librosa",
+    "moviepy",
+    "scipy",
+    "werkzeug",
+    "ids"
+]

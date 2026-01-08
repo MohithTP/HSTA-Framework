@@ -2,7 +2,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 from models.hybrid_summarizer import HSTA_Summarizer
-from feature_extractor import FeatureExtractor
+from models.feature_extractor import FeatureExtractor
 from utils.audio_extractor import AudioExtractor
 import cv2
 import numpy as np
@@ -27,17 +27,22 @@ def extract_features(video_path, device):
     vis_feats_list = []
     
     curr = 0
+    curr = 0
+    skip_frames = 15 # Downsample to ~2 FPS (assuming 30fps source)
+    
     while True:
         ret, frame = cap.read()
         if not ret: break
         
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frames_buffer.append(frame)
-        
-        if len(frames_buffer) >= 32:
-            vf = vis_ext.extract(frames_buffer)
-            vis_feats_list.append(vf)
-            frames_buffer = []
+        if curr % skip_frames == 0:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frames_buffer.append(frame)
+            
+            if len(frames_buffer) >= 32:
+                vf = vis_ext.extract(frames_buffer)
+                vis_feats_list.append(vf)
+                frames_buffer = []
+        curr += 1
             
     if frames_buffer:
         vf = vis_ext.extract(frames_buffer)
@@ -45,13 +50,24 @@ def extract_features(video_path, device):
         
     cap.release()
     
-    vis_feats = torch.cat(vis_feats_list) # (T, 960)
+    if not vis_feats_list:
+        print("Error: No frames extracted.")
+        return torch.zeros(1, 1088).to(device)
+
+    vis_feats = torch.cat(vis_feats_list) # (T_subsampled, 960)
+    
+    # Adjust Audio to match subsampled length
+    # Effective FPS for audio sync
+    effective_fps = fps / skip_frames
+    audio_feats = audio_ext.extract(video_path, fps=effective_fps) # (T_sub, 128)
     
     # 3. Fuse
-    # Truncate to min length
+    # Truncate to min length or pad
     min_len = min(vis_feats.shape[0], audio_feats.shape[0])
     vis_feats = vis_feats[:min_len]
     audio_feats = torch.tensor(audio_feats[:min_len], dtype=torch.float32)
+    # If using skip_frames, visual might be slightly less than audio or vice versa.
+    # The min_len policy is safe.
     
     fused_feats = torch.cat((vis_feats, audio_feats), dim=1) # (T, 1088)
     

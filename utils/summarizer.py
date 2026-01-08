@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from models.hybrid_summarizer import HSTA_Summarizer
-from feature_extractor import FeatureExtractor
+from models.feature_extractor import FeatureExtractor
 from .audio_extractor import AudioExtractor
 
 class VideoSummarizer:
