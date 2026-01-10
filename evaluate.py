@@ -3,12 +3,6 @@ import numpy as np
 import os
 
 def compute_fscore(pred_scores, gt_scores, overlap_threshold=0.5):
-    """
-    Computes F-score for video summarization.
-    This is a simplified metric. Standard evaluation often uses 
-    User Summaries and finds the best match.
-    """
-    # Threshold predictions
     pred_binary = (pred_scores > 0.5).astype(int)
     gt_binary = (gt_scores > 0.5).astype(int)
     
@@ -26,9 +20,6 @@ def evaluate(model, test_loader, device='cpu'):
     with torch.no_grad():
         for inputs, targets in test_loader:
             inputs, targets = inputs.to(device), targets.to(device)
-            # Assuming inputs is a video batch, but HSTA takes (Segments, Frames, Dim)
-            # We might need to iterate over videos if loader batches videos.
-            # For simplicity, assuming loader returns one video's segments at a time.
             
             scores, _, _ = model(inputs)
             f = compute_fscore(scores.cpu().numpy().flatten(), targets.cpu().numpy().flatten())
